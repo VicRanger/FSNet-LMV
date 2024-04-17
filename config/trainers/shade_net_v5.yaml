@@ -1,0 +1,28 @@
+trainer: {
+    "class": "ShadeNetV5d4Trainer",
+    "debug_data_flow": true,
+    "recurrent_train": true,
+    'recurrent_train_start': 0.0,
+    "recurrent_test": true,
+}
+dataset: {
+  "class": "ShadeNetV5Dataset",
+  "path": "",
+  "flip": true,
+  "shuffle_metadata": true,
+  "shuffle_loader": false,
+  "augment_loader": false,
+  "pin_memory": false,
+  "train_num_worker_sum": 1,
+  "test_num_worker": 1,
+  "mode": "sep",  # "sep" or "mix", the default is "mix"
+  "train_scale": !!float 1.0,
+  "is_block": true,
+  "is_block_part": true,
+  "block_size": 8,
+  "part_size": 8,
+  "train_scene": [
+  ],
+  "test_scene": [
+  ],
+}

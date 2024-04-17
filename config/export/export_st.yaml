@@ -1,0 +1,5 @@
+job_name: "export"
+config_root_path: "config/"
+base: "includes/dataset_export_job.yaml"
+pipeline: []
+include: ["includes/dataset_export_data_st.yaml"]

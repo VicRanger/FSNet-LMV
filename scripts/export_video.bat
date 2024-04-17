@@ -1,0 +1,10 @@
+python src/test/test_export_video.py --path F:\FC_T\FC_01_720\SceneColorNoST_a16 --filename FC_01_SCNoST
+python src/test/test_export_video.py --path F:\FC_T\FC_02_720\SceneColorNoST_a16 --filename FC_02_SCNoST
+python src/test/test_export_video.py --path F:\FC_T\FC_03_720\SceneColorNoST_a16 --filename FC_03_SCNoST
+python src/test/test_export_video.py --path F:\FC_T\FC_04_720\SceneColorNoST_a16 --filename FC_04_SCNoST
+python src/test/test_export_video.py --path F:\FC_T\FC_01_720\SceneColor_a16 --filename FC_01_SC
+python src/test/test_export_video.py --path F:\FC_T\FC_02_720\SceneColor_a16 --filename FC_02_SC
+python src/test/test_export_video.py --path F:\FC_T\FC_03_720\SceneColor_a16 --filename FC_03_SC
+python src/test/test_export_video.py --path F:\FC_T\FC_04_720\SceneColor_a16 --filename FC_04_SC
+python src/test/test_export_video.py --path F:\FC_T\FC_05_720\SceneColorNoST_a16 --filename FC_05_SCNoST
+python src/test/test_export_video.py --path F:\FC_T\FC_05_720\SceneColor_a16 --filename FC_05_SC

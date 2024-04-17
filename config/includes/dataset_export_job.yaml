@@ -1,0 +1,18 @@
+include_name: job_config
+num_thread: 8
+import_path: "/path/to/raw_data"
+export_path: "/path/to/export_data"
+overwrite: true
+scene: [
+  "FC_T/FC_01_720",
+  "FC_T/FC_02_720",
+  "FC_T/FC_03_720",
+  "FC_T/FC_04_720",
+  "FC_T/FC_05_720",
+]
+test_config: 
+  enable: false
+  nums: 20
+scene_info_name: "SceneInfo"
+pattern: "{}/{}/frame_{}.{}"
+num_history_frame: 0

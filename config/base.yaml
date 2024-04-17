@@ -1,0 +1,76 @@
+job_name: "month_day/version_modelname_settings"
+config_root_path: "config/"
+base: null
+pipeline: [
+  # "export/export.yaml"
+]
+include: [
+  "includes/dataset_export_data_st.yaml",
+  "includes/dataset_export_job.yaml",
+]
+train_parameter:
+  epoch: 150
+  batch_size: 6
+  lr: !!float 3e-4
+  decay_at: !!float 1.0
+  lr_mode: "flat"
+debug: false
+num_gpu: 0
+cuda_visible_devices: ""
+clear_output_path: false
+dataset:
+  class: ""
+  # recurrent_train: true,
+  # recurrent_test: true,
+  # recurrent_train_start: 0.5,
+  # brdf_demodulate: true
+  # for compatibility for old version config
+  flip: false
+  shuffle_metadata: false
+  shuffle_loader: false
+  pin_memory: false
+  path: ""
+  train_num_worker_sum: 6
+  test_num_worker: 1
+  mode: "sep"
+  train_scale: 1.0
+  block: true
+  block_size: 8
+  train_scene: []
+  test_scene: []
+  part: []
+  history_config: {}
+trainer:
+  class: ""
+  debug_data_flow: true
+loss:
+  class: "LossFunction"
+  train_loss: {}
+  debug_loss: {}
+log:
+  train_scalar_epoch_sum: 5
+  train_image_epoch_sum: 1
+  test_image_epoch_sum: 30
+  train: {
+    # log_item_config_node
+    # {"source": "scale_name", "name": "display_name", "fmt": "{:.2g}", "bar_step": false, "bar_epoch": false, "log_step": true, "log_epoch": true},
+  }
+  test: {
+    # log_item_config_node
+    # {"source": "scale_name", "name": "display_name", "fmt": "{:.2g}", "bar_step": false, "bar_epoch": false, "log_step": true, "log_epoch": true},
+  }
+model:
+  model_name: "instance_model_name"
+  class: ""
+  precision: "fp32"
+  
+
+
+
+
+  
+
+
+
+
+

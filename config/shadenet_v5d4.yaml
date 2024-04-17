@@ -1,0 +1,96 @@
+job_name: "train/shadenet_v5d4_FC"
+config_root_path: "config/"
+base: "pipeline/shade_net_v5d4.yaml"
+pipeline: [
+    "pipeline/shade_net_v5d4_smv0_w12.yaml",
+    "trainers/shade_net_v5.yaml",
+]
+# initial_inference: false
+# trainer:
+#     debug_data_flow: false
+
+include: []
+train_parameter: {
+    "epoch": 150,
+    "batch_size": 2,
+    "lr_config": {
+        "mode": flat,
+        # "decay_at": 0.75,
+        "value": !!float 2e-4,
+        # "low": !!float 5e-5,
+    }
+}
+debug: False
+num_gpu: 1
+cuda_visible_devices: '0\,1\,2\,3'
+output_root_path: "../output/train_output/"
+clear_output_path: True
+buffer_config:
+    mu: !!float 8.0
+dataset: 
+    path: "/path/to/export_data/"
+    path: "E:/Export/"
+    scale_config: {}
+    # pin_memory: true
+    shuffle_metadata: false
+    shuffle_loader: false
+    augment_loader: false
+    train_num_worker_sum: 2
+    block_size: 8
+    part_size: 2
+    train_scale: !!float 1.0
+    train_scene: [
+      {"name":"FC_T/FC_01_720", "config":{"indice":[]}},
+      {"name":"FC_T/FC_02_720", "config":{"indice":[]}},
+      {"name":"FC_T/FC_03_720", "config":{"indice":[]}},
+      {"name":"FC_T/FC_04_720", "config":{"indice":[]}},
+    ]
+    test_scene: [
+      # {"name":"DT/DT_01", "config":{"indice":[]}},
+      # {"name":"DT/DT_02", "config":{"indice":[]}},
+      # {"name":"DT/DT_03", "config":{"indice":[]}},
+      # {"name":"DT/DT_04", "config":{"indice":[]}},
+      {"name":"FC_T/FC_05_720", "config":{"indice":[600]}},
+    ]
+model: {
+    "model_name": "v5d4_FC",
+    "target_pr": 0,
+    "train_probs":  [0.5, 0.5, 0.5],
+    "test_probs": [0, 1, 0],
+    "shade_encoder": {
+        "input_buffer": [
+            "brdf_color",
+        ],
+    },
+    loss_config: {
+        "zero_flow_mask": false,
+        "zero_flow_ratio": 0.1,
+        # "c1_flow_ratio": 0.1,
+        # "zero_flow2_ratio": 0.01,
+    },
+    loss: [
+        "zero_flow",
+        # "c1_flow",
+        # "zero_flow2",
+    ],
+    debug: [
+
+    ],
+    feature: [
+        "demodulate",
+        # "demodulate_after_warp",
+        "demodulate_before_warp",
+        "st",
+        "recurrent",
+        "temporal_warped_feature",  # add temporal reuse of feature
+        "smv0",  # add flow estimation to perform spacial warping
+        "sep_smv_res",
+        "history_smv0",
+        "history_sep_smv_res",
+        "output_warp1", # warp last input history frame
+        "output_warp2", # warp last input history frame
+        "no_st_warp1",
+        "sky_warp1",
+        "st_warp2",
+    ],
+}

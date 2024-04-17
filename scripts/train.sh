@@ -1,0 +1,1 @@
+python ./src/test/test_train.py --train --test --config ./config/shadenet_v5d4_FC.yaml

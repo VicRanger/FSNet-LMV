@@ -1,0 +1,210 @@
+
+include_name: buffer_config
+# pipeline: [includes/dataset_augmented_data_recipe.yaml]
+include: [includes/dataset_augmented_data_recipe.yaml]
+demodulation: true
+demodulation_mode: "brdf"
+dual: false
+scale_regex: 
+  ds_scale:
+    enable: false
+    pattern: "%ds"
+    target: "d{}"
+    value: null
+  aa_scale:
+    enable: false
+    pattern: "%aa"
+    target: "a{}"
+    value: null
+  up_scale:
+    enable: false
+    pattern: "%uu"
+    target: "u{}"
+    value: null
+engine_buffer: {
+  "BaseColor_%aa": {"suffix": "EXR"},
+  "BrdfColor_%aa": {"suffix": "EXR"},
+  "MetallicRoughnessSpecular_%aa": {"suffix": "EXR"},
+  "NoVSTAlpha_%aa": {"suffix": "EXR"},
+  "SceneColorNoST_%aa": {"suffix": "EXR"},
+  "SceneColor_%aa": {"suffix": "EXR"},
+  "SkyboxMask_%aa": {"suffix": "EXR"},
+#   "STColor_%aa": {"suffix": "EXR"},
+  "SkyColor": {"suffix": "EXR"},
+#   "VelocityDepth_u2": {"suffix": "EXR"},
+  "VelocityDepth": {"suffix": "EXR"},
+  "WorldNormal": {"suffix": "EXR"},
+  "WorldPosition": {"suffix": "EXR"},
+}
+history_buffer: {
+
+}
+output_buffer: {
+    # "st_color": {"origin": "STColor","channel": [0, 1, 2]},
+    # "scene_color": {"origin": "SceneColorNoST_%aa","channel": [0, 1, 2]},
+
+    "base_color": {"origin": "BaseColor_%aa","channel": [0, 1, 2]},
+    "brdf_color": {"origin": "BrdfColor_%aa","channel": [0, 1, 2]},
+    "metallic": {"origin": "MetallicRoughnessSpecular_%aa","channel": [0]},
+    "roughness": {"origin": "MetallicRoughnessSpecular_%aa","channel": [1]},
+    "specular": {"origin": "MetallicRoughnessSpecular_%aa","channel": [2]},
+    "nov": {"origin": "NoVSTAlpha_%aa","channel": [0]},
+    "st_alpha": {"origin": "NoVSTAlpha_%aa","channel": [1]},
+    "scene_color": {"origin": "SceneColor_%aa","channel": [0, 1, 2]},
+    "scene_color_no_st": {"origin": "SceneColorNoST_%aa","channel": [0, 1, 2]},
+    "skybox_mask": {"origin": "SkyboxMask_%aa","channel": [1]},
+    "sky_color": {"origin": "SkyColor","channel": [0, 1, 2]},
+    "motion_vector": {"origin": "VelocityDepth","channel": [0, 1]},
+    # "u2_motion_vector": {"origin": "VelocityDepth_u2","channel": [0, 1]},
+    "depth": {"origin": "VelocityDepth","channel": [2]},
+    "world_normal": {"origin": "WorldNormal","channel": [0, 1, 2]},
+    "world_position": {"origin": "WorldPosition","channel": [0, 1, 2]},
+}
+augmented_data_on_the_fly: [
+    # "skybox_mask",
+    # "scene_light_no_st",
+    # "st_color",
+]
+dual_exclusion: [
+    "light__directional_light_camera_direction",
+]
+crop_config: {
+    "enable": False,
+    'width': 256,
+    'height': 256,
+    'nums': 32,
+    'patch_nums': 16,
+    'max_iter': 32,
+    'mask_threshold': 0.01,
+    'skybox_threshold': 0.5,
+    'grid': [1,1],
+    'write_path': "../output/crop_list"
+}
+metadata_part: "metadata"
+basic_part_enable_list: [
+    metadata,
+    base_color,
+    gbuffer,
+    # scene_color,
+    scene_color_no_st,
+    skybox_mask,
+    sky_color,
+    st,
+    depth,
+    motion_vector,
+    # u2_motion_vector,
+    world_normal,
+    world_position,
+    nov,
+    # brdf_color,
+]
+addition_part_enable_list: [
+    # extranet,
+    extranet_fast,
+#   "history_extend",
+#   "history_brdf_color",
+]
+part: {
+    "metadata":   {
+        "type": "fp32",
+        "buffer_name": [
+            "metadata",
+        ],
+    },
+    "camera_info":   {
+        "type": "fp32",
+        "buffer_name": [
+            "camera__forward",
+            "camera__position",
+            "camera__proj_matrix",
+            "camera__view_matrix",
+        ],
+    },
+    "base_color": { 
+        "type": "fp16",
+        "buffer_name": [
+            "base_color",
+        ],
+    },
+    "brdf_color": { 
+        "type": "fp16",
+        "buffer_name": [
+            "brdf_color",
+        ],
+    },
+    "gbuffer": { 
+        "type": "fp16",
+        "buffer_name": [
+            "roughness",
+            "specular",
+            "metallic"
+        ],
+    },
+    "scene_color": { 
+        "type": "fp16",
+        "buffer_name": [
+            "scene_color",
+        ],
+    },
+    "scene_color_no_st": { 
+        "type": "fp16",
+        "buffer_name": [
+            "scene_color_no_st",
+        ],
+    },
+    "skybox_mask": { 
+        "type": "fp16",
+        "buffer_name": [
+            "skybox_mask",
+        ],
+    },
+    "sky_color": {
+        "type": "fp16",
+        "buffer_name": [
+            "sky_color",
+        ],
+    },
+    "st": { 
+        "type": "fp16",
+        "buffer_name": [
+            "st_color",
+            "st_alpha",
+        ],
+    },
+    "depth": { 
+        "type": "fp16",
+        "buffer_name": [
+            "depth",
+        ],
+    },
+    "u2_motion_vector": { 
+        "type": "fp16",
+        "buffer_name": [
+            "u2_motion_vector",
+        ],
+    },
+    "motion_vector": { 
+        "type": "fp16",
+        "buffer_name": [
+            "motion_vector",
+        ],
+    },
+    "world_normal": { 
+        "type": "fp16",
+        "buffer_name": [
+            "world_normal",
+        ],
+    },
+    "nov": { 
+        "type": "fp16",
+        "buffer_name": [
+            "nov",
+        ],
+    },
+    "world_position": { 
+        "type": "fp16",
+        "buffer_name": [
+            "world_position",
+        ],
+    },
+}

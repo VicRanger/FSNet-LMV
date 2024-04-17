@@ -1,0 +1,186 @@
+job_name: "shade_net_v5d4"
+base: "base.yaml"
+pipeline: [
+    "pipeline/shade_net_v5d4_loss.yaml",
+]
+include: []
+dataset: {
+  "demodulation_mode": "brdf",
+  "part": [metadata, gbuffer, depth ,base_color, world_normal, scene_color_no_st, nov, motion_vector, sky_color, skybox_mask, st, ],
+  "history_config": {
+      "generate_from_data": false,
+      "allow_skip": false,
+      "num": 3,
+      "index": [0, 1, 2],
+      "part": [
+        [metadata, gbuffer, depth, base_color, scene_color_no_st, nov, motion_vector, sky_color, skybox_mask, st,],
+        [metadata, gbuffer, depth, base_color, scene_color_no_st, nov, motion_vector, sky_color, skybox_mask, st,],
+        [metadata, gbuffer, depth, base_color, scene_color_no_st, nov, motion_vector, sky_color, skybox_mask, st,],
+        ],  
+      'augmented_data': [
+        ["scene_color_no_st", "scene_color", "dmdl_color", "scene_light_no_st", "sky_color", "st_color", "st_alpha"],
+        ["scene_color_no_st", "dmdl_color", "scene_light_no_st", "sky_color", "st_color", "st_alpha"],
+        ["scene_color_no_st", "dmdl_color", "scene_light_no_st", "sky_color", "st_color", "st_alpha"],
+      ]
+  }
+}
+model: {
+    # "fp16":true,
+    "model_name": "shade_net_v5d4",
+    "class": "ShadeNetModelV5d4",
+    "gt_alias": "scene_color",
+    "tonemap_in_his_encoder": false,
+    "config":{
+        "feature_warp_mode": "bilinear"
+    },
+    "require_data": [
+        "brdf_color",
+        "dmdl_color",
+    ],
+    "input_buffer": [
+        "dmdl_color",
+        "history_dmdl_color_0",
+        "scene_color",
+        "skybox_mask",
+        "merged_motion_vector_0",
+        "merged_motion_vector_1",
+        "merged_motion_vector_2",
+        "history_scene_color_0",
+        "history_scene_color_no_st_0",
+        "history_scene_color_no_st_1",
+        "history_scene_color_no_st_2",
+        "history_scene_light_no_st_0",
+        "history_scene_light_no_st_1",
+        "history_scene_light_no_st_2",
+        "history_st_color_0",
+        "history_st_color_1",
+        "history_st_color_2",
+        "history_st_alpha_0",
+        "history_st_alpha_1",
+        "history_st_alpha_2",
+        "history_sky_color_0",
+        "history_sky_color_1",
+        "history_sky_color_2",
+        # for debugging
+        "scene_color_no_st",
+        "scene_light_no_st",
+        "sky_color",
+        "st_color",
+        "nov",
+        "st_alpha",
+        "metadata"
+    ],
+    "target_pr": 0,
+    "train_probs": [0, 1, 0],
+    "test_probs": [0, 1, 0],
+    "residual_item": "history_scene_color_no_st_0",
+    "st_color_names": ['st_alpha', 'st_color', 'sky_color'],
+    "st_history_names": ['history_st_alpha_0', 'history_st_color_0', 'history_sky_color_0'],
+    # "st_history_names":['history_st_alpha_0', 'history_st_color_0', 'history_scene_color_no_st_0'],
+    "feature_warp_padding_mode": "border",  # border or zeros
+    "loss_config": {
+        # "zero_residual_ratio": 1,
+        "zero_flow_ratio": 0.1,
+        "c1_flow_ratio": 0.1,
+        # "zero_flow2_ratio": 0.01,
+        # "zero_occ_mask_ratio": 0.1,
+    },
+    "loss": [
+        "zero_flow",
+        "c1_flow",
+        # "zero_flow2",
+    ],
+    "debug": [
+        # "scene_color_normalize",
+        # "mask",
+        # "fake_temporal", # perform temporal warped feature, but set motion_vector to zero
+    ],
+    "method": "residual",  # shade residual
+    "feature": [
+        "demodulate",
+        # "demodulate_after_warp",
+        "st",
+        # "st_residual",
+        "sky_residual",
+        "recurrent",
+        # "output_concat",  # concat input_block to output_block
+        "temporal_warped_feature",  # add temporal reuse of feature
+        # "omv",  
+        # "smv0",  # add flow estimation to perform spacial warping
+        # "smv1",  # add flow estimation to perform spacial warping
+        # "sep_smv_res",
+        # "pyramid_occ_mask",  
+        # "masked_warp", # use diff exp mask to guide warp
+        # "shadow", # add pyramid shadow
+        # "shade_residual", # add residual learning for shade method
+        # "output_warp1", # warp last input history frame
+        # "output_warp2", # warp last input history frame
+        # "no_st_warp1",
+        # "sky_warp1",
+        # "st_warp2",
+        # "separate_warp",
+    ],
+    "history_encoders": {
+        "num": 3,
+        "mv_name": "merged_motion_vector_{}",
+        "warped_scene_light_name": "history_warped_scene_light_{}",
+        "warped_scene_color_no_st_name": "history_warped_scene_color_no_st_{}",
+        "history_scene_color_no_st_name": "history_scene_color_no_st_{}",
+        "input_template": [
+            "history_scene_light_no_st_{}",
+            "history_sky_color_{}",
+            "history_st_color_{}",
+            "history_st_alpha_{}",
+        ],
+        "output_prefix_template": "he_{}_",
+        "history_id": [0, 1, 2],
+    },
+    "scene_color_encoder_output_prefix": "sce_",
+    "scene_color_encoder": {
+        "class": "ShadeNetEncoder",
+        "skip-layer": true,
+        "struct": {
+            "input": [16],
+            "encoder": [[24], [32], [48], [48]],
+        },
+        "input_buffer": [
+            "scene_light_no_st",
+            "sky_color",
+            "st_color",
+            "st_alpha",
+        ],
+        "act_func": "prelu",
+        # "norm_func": "batch_norm_2d",
+        # "act_func": "relu",
+    },
+    "shade_encoder": {
+        "class": "ShadeNetEncoder",
+        "output_prefix": "se_",
+        "skip-layer": true,
+        "struct": {
+            "input": [16],
+            "encoder": [[24], [32], [48], [48]]
+        },
+        "input_buffer": [
+            "roughness",
+            "metallic",
+            "world_normal",
+            "depth"
+        ],
+        "act_func": "prelu",
+    },
+    "shade_decoder__residual": {
+        "class": "ShadeNetDecoder",
+        "skip-cat": true,
+        "skip_conn_start": 1,
+        "skip_conn_offset": 1,
+        "struct": {
+            "decoder":  [[96, 96], [128, 64], [96, 48], [64, 32]],
+            "output": [32, 0],  # 0 is the space holder for output channels
+        },
+        "output_buffer": [
+            {"name": "residual_output", "channel": 3},
+        ],
+        "act_func": "prelu",
+    },
+}

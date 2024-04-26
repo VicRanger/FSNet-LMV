@@ -123,11 +123,11 @@ def inference():
                     log.debug(dict_to_string(epoch_dict))
                     
                     log.debug(float(LossFunction.single_ops["psnr"]([pred, gt]).mean().item()))
-                    error_4x = 4 * torch.abs(pred - gt)
+                    error = torch.abs(pred - gt)
                     write_buffer(tnr.config['write_path']+f"dmdl_color/dmdl_color{str(index).zfill(4)}.exr", tnr.cur_data['dmdl_color'][0], mkdir=True)
                     write_buffer(tnr.config['write_path']+f"pred_scene_light_no_st/pred_scene_light_no_st_{str(index).zfill(4)}.exr", tnr.cur_output['pred_scene_light_no_st'][0], mkdir=True)
                     write_buffer(tnr.config['write_path']+f"pred/pred_{str(index).zfill(4)}.exr", pred, mkdir=True)
-                    write_buffer(tnr.config['write_path']+f"error_4x/error_4x_{str(index).zfill(4)}.exr", error_4x, mkdir=True)
+                    write_buffer(tnr.config['write_path']+f"error/error_{str(index).zfill(4)}.exr", error, mkdir=True)
                     write_buffer(tnr.config['write_path']+f"gt/gt_{str(index).zfill(4)}.exr", gt, mkdir=True)
                     # write_buffer(tnr.config['write_path']+f"gt/gt_{str(index).zfill(4)}.png", gamma(gt), mkdir=True)
 

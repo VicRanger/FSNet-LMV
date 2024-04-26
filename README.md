@@ -4,6 +4,8 @@ This is offical repository for our paper, **Adaptive Recurrent Frame Prediction 
 **Authors:** Zhizhen Wu, Chenyu Zuo, Yuchi Huo, Yazhen Yuan, Yinfan Peng, Guiyang Pu, Rui Wang and Hujun Bao.<br>
 in SIGGRAPH Asia 2023 Conference Proceedings
 
+![pic](asset/pic.png)
+
 > **Abstract:** The utilization of dedicated ray tracing graphics cards has revolutionized the production of stunning visual effects in real-time rendering. However, the demand for high frame rates and high resolutions remains a challenge. The pixel warping approach is a crucial technique for increasing frame rate and resolution by exploiting the spatio-temporal coherence. To this end, existing superresolution and frame prediction methods rely heavily on motion vectors from rendering engine pipelines to track object movements. This work builds upon state-of-the-art heuristic approaches by exploring a novel adaptive recurrent frame prediction framework that integrates learnable motion vectors. Our framework supports the prediction of transparency, particles, and texture animations, with improved motion vectors that capture shading, reflections, and occlusions, in addition to geometry movements. In addition, we introduce a feature streaming neural network, dubbed FSNet, that allows for the adaptive prediction of one or multiple sequential frames. Extensive experiments against state-of-the-art methods demonstrate that FSNet can operate at lower latency with significant visual enhancements and can upscale frame rates by at least two times. This approach offers a flexible pipeline to improve the rendering frame rates of various graphics applications and devices.
 
 
@@ -121,9 +123,11 @@ python src/test/test_inference.py
 [dataset sample (Onedrive) (211MB)](https://onedrive.live.com/?authkey=%21AD5zbeiyC%2DKmwlo&id=BDEFE6B920EF25D0%21109&cid=BDEFE6B920EF25D0)
 ## Pretrained network weights 
 [checkpoints (Onedrive) (8MB)](https://onedrive.live.com/?authkey=%21AD5zbeiyC%2DKmwlo&id=BDEFE6B920EF25D0%21108&cid=BDEFE6B920EF25D0)
-
+## Result
+An example output for frame #0005 using the provided dataset and pretrained model:
+![result](asset/result.png)
 (These resources are specific to the FutureCity scene and can be used for evaluating the pretrained model.) <br>
-P.S. Let me know if any part of this documentation could be improved or expanded on further.
+
 # Citation
 
 Thank you for being interested in our paper.  <br>
@@ -149,4 +153,4 @@ series = {SA '23}
 
 
 # Contact
-If you have any questions or suggestions about this repo, please feel free to contact me (jsnwu99@gmail.com).
+`:)` If you have any questions or suggestions about this repo, please feel free to contact me (jsnwu99@gmail.com).

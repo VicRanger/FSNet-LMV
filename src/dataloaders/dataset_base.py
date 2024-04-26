@@ -6,6 +6,7 @@ import numpy as np
 from torch.utils.tensorboard.summary import scalar
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+from utils.str_utils import dict_to_string
 from utils.buffer_utils import fix_dmdl_color_zero_value, gamma_log, inv_gamma_log, write_buffer
 from utils.log import log
 import random
@@ -82,7 +83,7 @@ def create_metadata_by_glob(path, scene, part_name):
     return metadatas
 
 
-def create_meta_data_list(config, start_cutoff=5):
+def create_meta_data_list(config, start_cutoff=3):
     shuffle = config['dataset']['shuffle_metadata']
     # shuffle_loader = config['dataset']['shuffle_loader']
     train_list = []
@@ -106,11 +107,7 @@ def create_meta_data_list(config, start_cutoff=5):
             res = glob.glob(f"{path}/{dir_name}/{config['buffer_config']['basic_part_enable_list'][0]}/[0-9]*.npz")
             if len(res) <= 0:
                 raise Exception(f"{config['buffer_config']['basic_part_enable_list'][0]} in {path}/{dir_name} not found.")
-            # log.debug(path)
-            # log.debug(dir_name)
-            # log.debug(res)
-            num = len(res) - start_cutoff
-            index = np.arange(start_cutoff, start_cutoff + num)
+
             sep_rule = item['config'].get('indice', [])
             if len(sep_rule) == 1:
                 num = sep_rule[0]
@@ -120,18 +117,14 @@ def create_meta_data_list(config, start_cutoff=5):
                 end = sep_rule[1]
                 num = end - start
                 index = np.arange(start_cutoff + start, start_cutoff + end)
-
+            else:
+                num = len(res) - start_cutoff
+                index = np.arange(start_cutoff, start_cutoff + num)
             if is_block:
-                index = index[:-block_size - 1:block_size]
+                index = index[:-block_size+1:block_size]
                 num = len(index)
 
-            # scale = item['config'].get('scale', 1)
-
-            # if scale!=1:
-            #     np.random.seed(time.time())
-            #     index = np.random.choice(index, int(len(list(index)) * scale), replace=False)
-            #     num = len(index)
-
+            log.debug(dict_to_string([start_cutoff, num, block_size, index]))
             train_list += [MetaData(dir_name, index[i])
                            for i in range(num)]
 
@@ -146,9 +139,7 @@ def create_meta_data_list(config, start_cutoff=5):
             res = glob.glob(f"{path}/{dir_name}/{config['buffer_config']['basic_part_enable_list'][0]}/[0-9]*.npz")
             if len(res) <= 0:
                 raise Exception(f"{config['buffer_config']['basic_part_enable_list'][0]} in {path}/{dir_name} not found.")
-            # log.debug(path)
-            # log.debug(dir_name)
-            # log.debug(res)
+
             num = len(res) - start_cutoff
             index = np.arange(start_cutoff, start_cutoff + num)
             sep_rule = item['config'].get('indice', [])
@@ -160,7 +151,7 @@ def create_meta_data_list(config, start_cutoff=5):
                 end = sep_rule[1]
                 index = index[start:end]
 
-            if is_block:
+            if is_block and not is_block_part:
                 index = index[:-block_size - 1:block_size]
 
             num = len(index)
@@ -175,8 +166,6 @@ def create_meta_data_list(config, start_cutoff=5):
         raise NotImplementedError(
             f"create dataset with {config['dataset']['mode']} mode, but only \'seq\' mode supported for dataset!")
 
-    # log.debug(train_list)
-    
     is_initial_shuffle_metadata = True
     if is_initial_shuffle_metadata:
         random.seed(2024)
@@ -188,8 +177,6 @@ def create_meta_data_list(config, start_cutoff=5):
     
 
     train_scale = config["dataset"].get("train_scale", 1)
-    # test_scale = config["dataset"].get("test_scale", 1)
-    # valid_scale = config["dataset"].get("valid_scale", 1)
 
     if train_scale != 1:
         log.debug(f"train_scale={train_scale}, scaling train_list(len={len(train_list)})")
@@ -197,19 +184,6 @@ def create_meta_data_list(config, start_cutoff=5):
         train_ind = np.random.choice(np.arange(len(train_list), dtype=int), int(len(train_list) * train_scale), replace=False)
         train_list = list(np.array(train_list)[train_ind])
         log.debug(f"scaled train_list(len={len(train_list)})")
-
-    # if valid_scale != 1 and len(valid_list) > 0:
-    #     np.random.seed(2023)
-    #     valid_ind = np.random.choice(np.arange(len(valid_list), dtype=int), int(len(valid_list) * valid_scale), replace=False)
-    #     valid_ind = sorted(list(valid_ind))
-    #     valid_list = list(np.array(valid_list)[valid_ind])
-
-    # if test_scale != 1:
-    #     np.random.seed(2023)
-    #     test_ind = np.random.choice(np.arange(len(test_list), dtype=int), int(len(test_list) * test_scale), replace=False)
-    #     test_ind = sorted(list(test_ind))
-    #     test_list = list(np.array(test_list)[test_ind])
-        
     
     if is_block:
         minimum_total_size = num_gpu * batch_size
@@ -229,7 +203,7 @@ def create_meta_data_list(config, start_cutoff=5):
                     expand_list.append(md.get_offset(block_id))
             len_expand_list = len(expand_list) 
             parted_block_size = _block_size // part_size
-            log.debug(f'{len(block_list)} {len_expand_list} {len(block_list) // _minimum_total_size * _minimum_total_size * parted_block_size}')
+            log.debug(f'len_block_list={len(block_list)} len_expand_list={len_expand_list} num_block={len(block_list) // _minimum_total_size * _minimum_total_size * parted_block_size}')
             assert len_expand_list == len(block_list) // _minimum_total_size * _minimum_total_size * parted_block_size
             ret_list = []
             len_batched_seq = _batch_size * parted_block_size
@@ -239,9 +213,9 @@ def create_meta_data_list(config, start_cutoff=5):
                     for batch_id in range(0, _batch_size):
                         ret_list.append(cut_list[batch_id * parted_block_size + block_id])
             return ret_list
-        train_list = generate_block_metadata(train_list, batch_size, num_gpu,block_size)
-        valid_list = generate_block_metadata(valid_list, 1, 1, block_size)
-        test_list = generate_block_metadata(test_list, 1,1,block_size)
+        train_list = generate_block_metadata(train_list, batch_size, num_gpu, block_size)
+        # valid_list = generate_block_metadata(valid_list, 1, 1, block_size)
+        # test_list = generate_block_metadata(test_list, 1, 1, block_size)
 
     log.debug("train: {} ... {}".format(str(train_list[:3]), str(train_list[-3:])))
     log.debug("test: {} ... {}".format(str(test_list[:3]), str(test_list[-3:])))

@@ -24,8 +24,8 @@ engine_buffer: {
   "SceneColorNoST": {"suffix": "EXR"},
   "SceneColor": {"suffix": "EXR"},
   "SkyboxMask": {"suffix": "EXR"},
-#   "STColor": {"suffix": "EXR"},
   "SkyColor": {"suffix": "EXR"},
+#   "VelocityDepth_u2": {"suffix": "EXR"},
   "VelocityDepth": {"suffix": "EXR"},
   "WorldNormal": {"suffix": "EXR"},
   "WorldPosition": {"suffix": "EXR"},
@@ -44,7 +44,6 @@ output_buffer: {
     "scene_color": {"origin": "SceneColor","channel": [0, 1, 2]},
     "scene_color_no_st": {"origin": "SceneColorNoST","channel": [0, 1, 2]},
     "skybox_mask": {"origin": "SkyboxMask","channel": [1]},
-    # "st_color": {"origin": "STColor","channel": [0, 1, 2]},
     "sky_color": {"origin": "SkyColor","channel": [0, 1, 2]},
     "motion_vector": {"origin": "VelocityDepth","channel": [0, 1]},
     "depth": {"origin": "VelocityDepth","channel": [2]},
@@ -56,27 +55,12 @@ augmented_data_on_the_fly: [
     # "scene_light_no_st",
     # "st_color",
 ]
-dual_exclusion: [
-    "light__directional_light_camera_direction",
-]
-crop_config: {
-    "enable": False,
-    'width': 256,
-    'height': 256,
-    'nums': 32,
-    'patch_nums': 16,
-    'max_iter': 32,
-    'mask_threshold': 0.01,
-    'skybox_threshold': 0.5,
-    'grid': [1,1],
-    'write_path': "../output/crop_list"
-}
 metadata_part: "metadata"
 basic_part_enable_list: [
     metadata,
     base_color,
     gbuffer,
-    scene_color,
+    # scene_color,
     scene_color_no_st,
     skybox_mask,
     sky_color,
@@ -86,26 +70,17 @@ basic_part_enable_list: [
     world_normal,
     world_position,
     nov,
-    brdf_color,
+    # brdf_color,
 ]
 addition_part_enable_list: [
-  "history_extend",
-  "history_brdf_color",
+    # extranet,
+    # extranet_fast,
 ]
 part: {
     "metadata":   {
         "type": "fp32",
         "buffer_name": [
             "metadata",
-        ],
-    },
-    "camera_info":   {
-        "type": "fp32",
-        "buffer_name": [
-            "camera__forward",
-            "camera__position",
-            "camera__proj_matrix",
-            "camera__view_matrix",
         ],
     },
     "base_color": { 
@@ -189,30 +164,4 @@ part: {
             "world_position",
         ],
     },
-    "extranet": {
-        "type": "fp16",
-        "num_history": 5,
-        "history_augmented_data":[
-            # "scene_color",
-        ],
-        "augmented_data": [
-            # "scene_color",
-            "history_occlusion_warped_scene_light_extranet",
-            "history_masked_occlusion_warped_scene_light_extranet",
-            "history_base_color_0",
-            "history_gt_0",
-        ],
-        "buffer_name":[
-            "history_base_color_0",
-            "history_gt_0",
-            "history_occlusion_warped_scene_light_0_extranet",
-            "history_masked_occlusion_warped_scene_light_0_extranet",
-            "history_masked_occlusion_warped_scene_light_1_extranet",
-            "history_masked_occlusion_warped_scene_light_2_extranet",
-            "history_occlusion_mask_0_extranet",
-            "history_occlusion_mask_1_extranet",
-            "history_occlusion_mask_2_extranet",
-            "occlusion_motion_vector_0_extranet",
-        ]
-    }, 
 }

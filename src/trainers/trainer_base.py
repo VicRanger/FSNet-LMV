@@ -125,9 +125,9 @@ class TrainerBase:
             self.output_path, self.time_string)
         self.writer_path = "{}/{}/writer".format(
             self.output_path, self.time_string)
-        self.checkpoint_path = "{}/{}/lastest_checkpoint".format(
+        self.checkpoint_path = "{}/{}/checkpoint".format(
             self.output_path, self.time_string)
-        self.history_checkpoint_path = "{}/{}/checkpoints".format(
+        self.history_checkpoint_path = "{}/{}/history_checkpoints".format(
             self.output_path, self.time_string)
 
         self.batch_size = self.train_config['batch_size']
@@ -218,7 +218,7 @@ class TrainerBase:
             self.config, 'train', self.train_meta_data, self.data_loader, mode="train")
 
         test_config = copy.deepcopy(self.config)
-        test_config['buffer_config']['crop_config']['enable'] = False
+        # test_config['buffer_config']['crop_config']['enable'] = False
         self.test_dataset = eval(self.config['dataset']['class'])(
             test_config, 'test', self.test_meta_data, self.data_loader, mode="test")
 
@@ -359,7 +359,7 @@ class TrainerBase:
         if self.resume:
             self.load_checkpoint()
 
-        if not self.resume and "pre_model" in self.config.keys():
+        if self.model is not None and not self.resume and "pre_model" in self.config.keys():
             self.model.load_by_path(self.config["pre_model"])
             log.debug("pre_model loaded: {}".format(self.config["pre_model"]))
 
@@ -369,7 +369,7 @@ class TrainerBase:
                 device_ids=[self.config['local_rank']],
                 output_device=self.config['local_rank'])
 
-        if self.enable_log:
+        if self.model is not None and self.enable_log:
             create_dir(self.log_path)
             create_dir(self.model_path)
             create_dir(self.writer_path)

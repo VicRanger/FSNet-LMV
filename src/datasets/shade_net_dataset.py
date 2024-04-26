@@ -43,11 +43,12 @@ class ShadeNetDataset(DatasetBase):
 class ShadeNetV5Dataset(ShadeNetDataset):
     def __init__(self, config, dataset_name, metadata, patch_loader, mode):
         super().__init__(config, dataset_name, metadata, patch_loader, mode)
+        self.part_size = self.config['dataset']['part_size'] if mode == 'train' else 1
 
     def __getitem__(self, index) -> list[dict]:
         datas = [self.patch_loader.load(self.metadatas[index].get_offset(i),
                                       history_config=self.config['dataset'].get('history_config', None), allow_skip=False)
-                 for i in range(self.config['dataset']['part_size'])]
+                 for i in range(self.part_size)]
         for i, item in enumerate(datas):
             assert self.metadatas[index].get_offset(i).index == item['metadata']['index'] - start_offset
         return datas

@@ -8,7 +8,6 @@ pipeline: [
 # initial_inference: false
 # trainer:
 #     debug_data_flow: false
-
 include: []
 train_parameter: {
     "epoch": 150,
@@ -24,12 +23,11 @@ debug: False
 num_gpu: 1
 cuda_visible_devices: '0\,1\,2\,3'
 output_root_path: "../output/train_output/"
-clear_output_path: True
+# clear_output_path: True
 buffer_config:
     mu: !!float 8.0
 dataset: 
     path: "/path/to/export_data/"
-    path: "E:/Export/"
     scale_config: {}
     # pin_memory: true
     shuffle_metadata: false
@@ -40,22 +38,20 @@ dataset:
     part_size: 2
     train_scale: !!float 1.0
     train_scene: [
-      {"name":"FC_T/FC_01_720", "config":{"indice":[]}},
-      {"name":"FC_T/FC_02_720", "config":{"indice":[]}},
-      {"name":"FC_T/FC_03_720", "config":{"indice":[]}},
-      {"name":"FC_T/FC_04_720", "config":{"indice":[]}},
+    #   {"name":"FC_T/FC_01_720", "config":{"indice":[]}},
+    #   {"name":"FC_T/FC_02_720", "config":{"indice":[]}},
+    #   {"name":"FC_T/FC_03_720", "config":{"indice":[]}},
+    #   {"name":"FC_T/FC_04_720", "config":{"indice":[]}},
+      {"name":"FC_T/FC_TEST_720", "config":{"indice":[]}},
     ]
     test_scene: [
-      # {"name":"DT/DT_01", "config":{"indice":[]}},
-      # {"name":"DT/DT_02", "config":{"indice":[]}},
-      # {"name":"DT/DT_03", "config":{"indice":[]}},
-      # {"name":"DT/DT_04", "config":{"indice":[]}},
-      {"name":"FC_T/FC_05_720", "config":{"indice":[600]}},
+    #   {"name":"FC_T/FC_05_720", "config":{"indice":[600]}},
+      {"name":"FC_T/FC_TEST_720", "config":{"indice":[]}},
     ]
 model: {
     "model_name": "v5d4_FC",
     "target_pr": 0,
-    "train_probs":  [0.5, 0.5, 0.5],
+    "train_probs":  [0, 1, 0],
     "test_probs": [0, 1, 0],
     "shade_encoder": {
         "input_buffer": [

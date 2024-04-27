@@ -152,7 +152,7 @@ def create_meta_data_list(config, start_cutoff=3):
                 index = index[start:end]
 
             if is_block and not is_block_part:
-                index = index[:-block_size - 1:block_size]
+                index = index[:-block_size+1:block_size]
 
             num = len(index)
 

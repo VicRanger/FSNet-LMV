@@ -23,7 +23,7 @@ cd code
 
 ## Export Buffers from UE4
 
-Corresbonding cpp code can be found in `scripts/CaptureManager/`. <br>
+Corresbonding cpp code can be found in `scripts/ue4_source_code/`. <br>
 1. Copy the .h and .cpp files into the source directory of the UE4 project, and then recompile the project. <br>
 2. Upon succesful compilation, there will be a new C++ Class in the `Content Browser`. This class functions as a placable Actor. To begin using the capture functionality, place the `CaptureManager` into scene, configure it and then you are ready to begin exporting the render buffer.
 
